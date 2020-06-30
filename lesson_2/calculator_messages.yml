@@ -1,12 +1,9 @@
 
 welcome: "Welcome to Calculator! Enter your name:"
 name_error: "Make sure to use a valid name."
-greeting: "Hi #{name}!"
 get_first_number: "What's the first number?"
 number_error: "Hmm... that doesn't look like a valid number"
 get_second_number: "What's the second number?"
 operator_error: "Must choose 1, 2, 3 or 4"
-calculating: "#{operation_to_message(operator)} the two numbers..."
-result: "The result is #{result}"
 quit_or_go: "Do you want to perform another calculation? (Y to calculate again)"
 
