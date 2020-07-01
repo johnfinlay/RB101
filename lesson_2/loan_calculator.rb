@@ -26,19 +26,30 @@ def fix_rate(num)
 end
 
 prompt("Welcome, let's calculate your loan payment!")
-prompt("What is the amount of the loan?")
-amount = get_number
 
-prompt("What is the Annual Percentage Rate(APR)?")
-apr = get_number
-rate = fix_rate(apr)
+loop do
+  prompt("What is the amount of the loan?")
+  amount = get_number
 
-prompt("What is the loan duration in years?")
-duration = get_number
+  prompt("What is the Annual Percentage Rate(APR)?")
+  apr = get_number
+  rate = fix_rate(apr)
 
-prompt("Calculating loan payment...")
+  prompt("What is the loan duration in years?")
+  duration = get_number
 
-monthly_payment = amount.to_f *
-                  (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
+  prompt("Calculating loan payment...")
 
-prompt("Your payment is $#{format('%.2f', monthly_payment)}")
+  monthly_payment = amount.to_f *
+                    (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
+
+  prompt("Your payment is $#{format('%.2f', monthly_payment)}")
+
+  prompt("Would you like to calculate another payment?(y/n)")
+  answer = gets.chomp
+
+  break unless answer.downcase.start_with?('y')
+end
+
+prompt("Thanks for using the Loan Calculator!")
+prompt("Bye!")
