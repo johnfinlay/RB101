@@ -6,7 +6,11 @@ def get_number
   loop do
     num = gets.chomp
     if num.to_i.to_s == num || num.to_f.to_s == num
-      return num
+      if num.to_f > 0
+        return num
+      else
+        prompt("No negative numbers please")
+      end
     else
       prompt("Hmm... that doesn't look like a valid number")
     end
@@ -14,7 +18,7 @@ def get_number
 end
 
 def fix_rate(num)
-  if num.to_f > 0
+  if num.to_f > 1
     num.to_f / 100 / 12
   else
     num.to_f / 12
