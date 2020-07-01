@@ -41,4 +41,4 @@ prompt("Calculating loan payment...")
 monthly_payment = amount.to_f *
                   (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
 
-prompt("Your payment is $#{monthly_payment.round(2)}")
+prompt("Your payment is $#{format('%.2f', monthly_payment)}")
