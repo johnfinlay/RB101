@@ -7,23 +7,21 @@ def prompt(message)
 end
 
 def get_input(input_type)
+  prompt(MESSAGES[input_type])
+  input = ''
   loop do
-    prompt(MESSAGES[input_type])
-    data = gets.chomp
-    case input_type
-    when "welcome", "calculating", "result", "continue", "exit"
-      return data
-    else
-      if data.to_i.to_s == data || data.to_f.to_s == data
-        if data.to_f >= 0
-          return data
-        else
-          prompt("No negative numbers please")
-        end
-      else
-        prompt("Hmm... that doesn't look like a valid number")
-      end
-    end
+    input = gets.chomp
+    break if invalid_input?(input_type, input)
+    prompt(MESSAGES["invalid_#{input_type}"])
+  end
+  input
+end
+
+def invalid_input?(input_type, input)
+  case input_type
+  when "continue" then %w(y n yes no).include?(input.downcase)
+  when "amount", "apr", "rate", "duration"
+    input.to_f.to_s == input || input.to_i.to_s == input
   end
 end
 
@@ -48,13 +46,11 @@ loop do
   monthly_payment = amount.to_f *
                     (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
 
-  prompt("#{MESSAGES["result"]} $#{format('%.2f', monthly_payment)}")
+  prompt("#{MESSAGES['result']} $#{format('%.2f', monthly_payment)}")
 
-  prompt(MESSAGES["continue"])
-  answer = gets.chomp
-
+  answer = get_input("continue")
   break unless answer.downcase.start_with?('y')
+  system "clear"
 end
 
 prompt(MESSAGES["exit"])
-
