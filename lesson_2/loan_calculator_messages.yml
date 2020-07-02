@@ -1,0 +1,13 @@
+
+welcome: "Welcome, let's calculate your loan payment!"
+amount: "What is the amount of the loan?"
+invalid_amount: ""
+apr: "What is the Annual Percentage Rate(APR)?"
+invalid_apr: ""
+duration: "What is the loan duration in years?"
+invalid_duration: ""
+calculating: "Calculating loan payment..."
+result: "Your payment is "
+continue: "Would you like to calculate another payment?(y/n)"
+exit: "Thanks for using the Loan Calculator!\n=> Bye!"
+

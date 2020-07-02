@@ -1,18 +1,28 @@
+require "yaml"
+require "pry"
+MESSAGES = YAML.load(File.read("loan_calculator_messages.yml"))
+
 def prompt(message)
   puts "=> #{message}"
 end
 
-def get_number
+def get_input(input_type)
   loop do
-    num = gets.chomp
-    if num.to_i.to_s == num || num.to_f.to_s == num
-      if num.to_f > 0
-        return num
-      else
-        prompt("No negative numbers please")
-      end
+    prompt(MESSAGES[input_type])
+    data = gets.chomp
+    case input_type
+    when "welcome", "calculating", "result", "continue", "exit"
+      return data
     else
-      prompt("Hmm... that doesn't look like a valid number")
+      if data.to_i.to_s == data || data.to_f.to_s == data
+        if data.to_f >= 0
+          return data
+        else
+          prompt("No negative numbers please")
+        end
+      else
+        prompt("Hmm... that doesn't look like a valid number")
+      end
     end
   end
 end
@@ -25,31 +35,26 @@ def fix_rate(num)
   end
 end
 
-prompt("Welcome, let's calculate your loan payment!")
+prompt(MESSAGES["welcome"])
 
 loop do
-  prompt("What is the amount of the loan?")
-  amount = get_number
-
-  prompt("What is the Annual Percentage Rate(APR)?")
-  apr = get_number
+  amount = get_input("amount")
+  apr = get_input("apr")
   rate = fix_rate(apr)
+  duration = get_input("duration")
 
-  prompt("What is the loan duration in years?")
-  duration = get_number
-
-  prompt("Calculating loan payment...")
+  prompt(MESSAGES["calculating"])
 
   monthly_payment = amount.to_f *
                     (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
 
-  prompt("Your payment is $#{format('%.2f', monthly_payment)}")
+  prompt("#{MESSAGES["result"]} $#{format('%.2f', monthly_payment)}")
 
-  prompt("Would you like to calculate another payment?(y/n)")
+  prompt(MESSAGES["continue"])
   answer = gets.chomp
 
   break unless answer.downcase.start_with?('y')
 end
 
-prompt("Thanks for using the Loan Calculator!")
-prompt("Bye!")
+prompt(MESSAGES["exit"])
+
