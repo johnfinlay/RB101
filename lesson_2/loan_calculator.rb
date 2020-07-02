@@ -1,6 +1,5 @@
 require "yaml"
-require "pry"
-MESSAGES = YAML.load(File.read("loan_calculator_messages.yml"))
+MESSAGES = YAML.safe_load(File.read("loan_calculator_messages.yml"))
 
 def prompt(message)
   puts "=> #{message}"
