@@ -19,10 +19,27 @@ end
 
 def invalid_input?(input_type, input)
   case input_type
-  when "continue" then %w(y n yes no).include?(input.downcase)
-  when "amount", "apr", "rate", "duration"
-    input.to_f.to_s == input || input.to_i.to_s == input
+  when "continue" then invalid_continue?(input)
+  when "amount" then invalid_amount?(input)
+  when "apr" then invalid_apr?(input)
+  when "duration" then invalid_duration?(input)
   end
+end
+
+def invalid_continue?(input)
+  %w(y n yes no).include?(input.downcase)
+end
+
+def invalid_amount?(input)
+  (input.to_f.to_s == input || input.to_i.to_s == input) && input.to_i > 0
+end
+
+def invalid_apr?(input)
+  (input.to_f.to_s == input || input.to_i.to_s == input) && input.to_i > 0
+end
+
+def invalid_duration?(input)
+  input.to_i.to_s == input && input.to_i > 0
 end
 
 def fix_rate(num)
@@ -31,6 +48,10 @@ def fix_rate(num)
   else
     num.to_f / 12
   end
+end
+
+def calculate_monthly_payment(amount, rate, duration)
+  amount.to_f * (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
 end
 
 prompt(MESSAGES["welcome"])
@@ -43,8 +64,7 @@ loop do
 
   prompt(MESSAGES["calculating"])
 
-  monthly_payment = amount.to_f *
-                    (rate / (1 - (1 + rate)**(duration.to_f * -12.0)))
+  monthly_payment = calculate_monthly_payment(amount, rate, duration)
 
   prompt("#{MESSAGES['result']} $#{format('%.2f', monthly_payment)}")
 
