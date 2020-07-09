@@ -49,6 +49,18 @@ end
 def prompt(message)
   puts "=> #{message}"
 end
+
+def play_again?
+  prompt(MESSAGES['play_again'])
+  answer = ''
+  loop do
+    answer = gets.chomp
+    break if %w(y n yes no).include?(answer.downcase)
+    prompt(MESSAGES['invalid_play_again'])
+  end
+  %w(n no).include?(answer.downcase)
+end
+
 players = {
   computer: {
     choice: '',
@@ -95,14 +107,7 @@ loop do
     system "clear"
   end
 
-  prompt(MESSAGES['play_again'])
-  answer = ''
-  loop do
-    answer = gets.chomp
-    break if %w(y n yes no).include?(answer.downcase)
-    prompt(MESSAGES['invalid_play_again'])
-  end
-  break if %w(n no).include?(answer.downcase)
+  break if play_again?
   system "clear"
 end
 
