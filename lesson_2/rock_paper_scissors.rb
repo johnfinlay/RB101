@@ -6,6 +6,9 @@ VALID_CHOICES = {
   'sp' => 'spock'
 }
 
+require "yaml"
+MESSAGES = YAML.safe_load(File.read("rps_messages.yml"))
+
 WINNERS = {
   'rock' => ['lizard', 'scissors'],
   'paper' => ['rock', 'spock'],
@@ -20,9 +23,9 @@ end
 
 def display_results(result)
   case result
-  when 'player' then prompt("You won!")
-  when 'computer' then prompt("Computer won!")
-  else prompt("It's a tie!")
+  when 'player' then prompt(MESSAGES['you_won_game'])
+  when 'computer' then prompt(MESSAGES['computer_won_game'])
+  else prompt(MESSAGES['tie'])
   end
 end
 
@@ -62,16 +65,15 @@ loop do
 
   loop do
     loop do
-      prompt("Choose one: rock(r), paper(p), "\
-        "scissors(sc), lizard(l), spock(sp)")
+      prompt(MESSAGES['choose'])
       players[:player][:choice] = gets.chomp.downcase
 
       break if VALID_CHOICES.keys.include?(players[:player][:choice])
-      prompt("That's not a valid choice.")
+      prompt(MESSAGES['invalid_choice'])
     end
 
     players[:computer][:choice] = VALID_CHOICES.keys.sample
-
+    
     prompt("You chose: #{VALID_CHOICES[players[:player][:choice]]}; "\
       "Computer chose: #{VALID_CHOICES[players[:computer][:choice]]}")
     result = get_result(players[:player][:choice], players[:computer][:choice])
@@ -79,20 +81,29 @@ loop do
     update_score(players, result)
 
     if players[:computer][:score] == 5
-      prompt("Computer won the match!")
+      prompt(MESSAGES['computer_won_match'])
       break
     elsif players[:player][:score] == 5
-      prompt("You won the match!")
+      prompt(MESSAGES['you_won_match'])
       break
     else
-      prompt("The score is now you: #{players[:player][:score]}, "\
-        "computer: #{players[:computer][:score]}\n\n")
+      prompt("#{MESSAGES['score_header']}#{players[:player][:score]}"\
+        "       #{players[:computer][:score]}\n\n")
     end
+    prompt(MESSAGES['any_key'])
+    gets.chomp
+    system "clear"
   end
 
-  prompt("Would you like to play again?")
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  prompt(MESSAGES['play_again'])
+  answer = ''
+  loop do
+    answer = gets.chomp
+    break if %w(y n yes no).include?(answer.downcase)
+    prompt(MESSAGES['invalid_play_again'])
+  end
+  break if %w(n no).include?(answer.downcase)
+  system "clear"
 end
 
-prompt("Thank you for playing. Good bye!")
+prompt(MESSAGES['bye'])
