@@ -64,7 +64,7 @@ loop do
     loop do
       prompt("Choose one: rock(r), paper(p), "\
         "scissors(sc), lizard(l), spock(sp)")
-      players[:player][:choice] = gets.chomp
+      players[:player][:choice] = gets.chomp.downcase
 
       break if VALID_CHOICES.keys.include?(players[:player][:choice])
       prompt("That's not a valid choice.")
