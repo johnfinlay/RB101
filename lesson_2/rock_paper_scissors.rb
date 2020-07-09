@@ -1,4 +1,11 @@
-VALID_CHOICES = %w(rock paper scissors lizard spock)
+VALID_CHOICES = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'l' => 'lizard',
+  'sp' => 'spock'
+}
+
 WINNERS = {
   'rock' => ['lizard', 'scissors'],
   'paper' => ['rock', 'spock'],
@@ -7,7 +14,7 @@ WINNERS = {
   'spock' => ['scissors', 'rock']
 }
 def win?(first, second)
-  WINNERS[first].include?(second)
+  WINNERS[VALID_CHOICES[first]].include?(VALID_CHOICES[second])
 end
 
 def display_results(player, computer)
@@ -27,16 +34,17 @@ end
 loop do
   choice = ''
   loop do
-    prompt("Choose one: rock, paper, scissors, lizard, spock")
+    prompt("Choose one: rock(r), paper(p), scissors(sc), lizard(l), spock(sp)")
     choice = gets.chomp
 
-    break if VALID_CHOICES.include?(choice)
+    break if VALID_CHOICES.keys.include?(choice)
     prompt("That's not a valid choice.")
   end
 
-  computer_choice = VALID_CHOICES.sample
+  computer_choice = VALID_CHOICES.keys.sample
 
-  prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
+  prompt("You chose: #{VALID_CHOICES[choice]}; "\
+    "Computer chose: #{VALID_CHOICES[computer_choice]}")
 
   display_results(choice, computer_choice)
 
