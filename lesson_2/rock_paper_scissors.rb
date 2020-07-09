@@ -1,8 +1,13 @@
-VALID_CHOICES = %w(rock paper scissors)
+VALID_CHOICES = %w(rock paper scissors lizard spock)
+WINNERS = {
+  'rock' => ['lizard', 'scissors'],
+  'paper' => ['rock', 'spock'],
+  'scissors' => ['paper', 'lizard'],
+  'lizard' => ['spock', 'paper'],
+  'spock' => ['scissors', 'rock']
+}
 def win?(first, second)
-  (first == 'rock' && second == 'scissors') ||
-    (first == 'paper' && second == 'rock') ||
-    (first == 'scissors' && second == 'paper')
+  WINNERS[first].include?(second)
 end
 
 def display_results(player, computer)
@@ -22,7 +27,7 @@ end
 loop do
   choice = ''
   loop do
-    prompt("Choose one: rock, paper, scissors")
+    prompt("Choose one: rock, paper, scissors, lizard, spock")
     choice = gets.chomp
 
     break if VALID_CHOICES.include?(choice)
