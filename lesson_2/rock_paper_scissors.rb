@@ -61,6 +61,40 @@ def play_again?
   %w(n no).include?(answer.downcase)
 end
 
+def player_chooses
+  choice = ''
+  loop do
+    prompt(MESSAGES['choose'])
+    choice = gets.chomp.downcase
+    break if VALID_CHOICES.keys.include?(choice)
+    prompt(MESSAGES['invalid_choice'])
+  end
+  choice
+end
+
+def get_winner(players)
+  if players[:computer][:score] == 5
+    "computer"
+  elsif players[:player][:score] == 5
+    "player"
+  end
+end
+
+def display_winner(winner)
+  case winner
+  when "computer" then prompt(MESSAGES['computer_won_match'])
+  when "player" then prompt(MESSAGES['you_won_match'])
+  end
+end
+
+def display_score(players)
+  prompt("#{MESSAGES['score_header']}#{players[:player][:score]}"\
+    "       #{players[:computer][:score]}\n\n")
+  prompt(MESSAGES['any_key'])
+  gets.chomp
+  system "clear"
+end
+
 players = {
   computer: {
     choice: '',
@@ -71,40 +105,28 @@ players = {
     score: 0
   }
 }
+
+system "clear"
+prompt(MESSAGES['welcome'])
+
 loop do
   players[:computer][:score] = 0
   players[:player][:score] = 0
-
   loop do
-    loop do
-      prompt(MESSAGES['choose'])
-      players[:player][:choice] = gets.chomp.downcase
-
-      break if VALID_CHOICES.keys.include?(players[:player][:choice])
-      prompt(MESSAGES['invalid_choice'])
-    end
-
+    players[:player][:choice] = player_chooses
     players[:computer][:choice] = VALID_CHOICES.keys.sample
-    
     prompt("You chose: #{VALID_CHOICES[players[:player][:choice]]}; "\
       "Computer chose: #{VALID_CHOICES[players[:computer][:choice]]}")
     result = get_result(players[:player][:choice], players[:computer][:choice])
     display_results(result)
     update_score(players, result)
-
-    if players[:computer][:score] == 5
-      prompt(MESSAGES['computer_won_match'])
-      break
-    elsif players[:player][:score] == 5
-      prompt(MESSAGES['you_won_match'])
+    winner = get_winner(players)
+    if winner
+      display_winner(winner)
       break
     else
-      prompt("#{MESSAGES['score_header']}#{players[:player][:score]}"\
-        "       #{players[:computer][:score]}\n\n")
+      display_score(players)
     end
-    prompt(MESSAGES['any_key'])
-    gets.chomp
-    system "clear"
   end
 
   break if play_again?
