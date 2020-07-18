@@ -143,9 +143,87 @@ arr.map { |sub_arr| sub_arr.sort! { |a, b| b <=> a } }
 arr = [{a: 1}, {b: 2, c: 3}, {d: 4, e: 5, f: 6}]
 
 arr2 = arr.map do |hsh|
-  hsh.each do |key, value|
-    # ???
+  hsh.each_with_object({}) do |(key, value), hsh2|
+    hsh2[key] = value + 1
   end
 end
-p arr
-p arr2
+# p arr
+# p arr2
+
+# Given the following data structure use a combination of methods, including
+# either the select or reject method, to return a new array identical in
+# structure to the original but containing only the integers that are
+# multiples of 3.
+
+arr = [[2], [3, 5, 7], [9], [11, 13, 15]]
+arr.map { |list| list.select { |num| num % 3 == 0 } }
+
+# Given the following data structure, and without using the Array#to_h method,
+# write some code that will return a hash where the key is the first item in
+# each sub array and the value is the second item.
+
+arr = [[:a, 1], ['b', 'two'], ['sea', {c: 3}], [{a: 1, b: 2, c: 3, d: 4}, 'D']]
+arr.each_with_object({}) { |sub, hsh| hsh[sub[0]] = sub[1] }
+# expected return value: 
+# {:a=>1, "b"=>"two", "sea"=>{:c=>3}, {:a=>1, :b=>2, :c=>3, :d=>4}=>"D"}
+
+# Given the following data structure, return a new array containing the same
+# sub-arrays as the original but ordered logically by only taking into
+# consideration the odd numbers they contain.
+
+arr = [[1, 6, 7], [1, 4, 9], [1, 8, 3]]
+new_arr = arr.sort_by { |sub| sub.select { |num| num.odd? } }
+# The sorted array should look like this:
+
+new_arr == [[1, 8, 3], [1, 6, 7], [1, 4, 9]] # true
+
+# Given this data structure write some code to return an array
+# containing the colors of the fruits and the sizes of the vegetables.
+# The sizes should be uppercase and the colors should be capitalized.
+
+hsh = {
+  'grape' => {type: 'fruit', colors: ['red', 'green'], size: 'small'},
+  'carrot' => {type: 'vegetable', colors: ['orange'], size: 'medium'},
+  'apple' => {type: 'fruit', colors: ['red', 'green'], size: 'medium'},
+  'apricot' => {type: 'fruit', colors: ['orange'], size: 'medium'},
+  'marrow' => {type: 'vegetable', colors: ['green'], size: 'large'},
+}
+
+# The return value should look like this:
+arr = []
+hsh.values.each do |hsh2|
+  if hsh2[:type] == 'fruit'
+    arr << hsh2[:colors].map(&:capitalize)
+  else
+    arr << hsh2[:size].upcase
+  end
+end
+
+arr == [["Red", "Green"], "MEDIUM", ["Red", "Green"], ["Orange"], "LARGE"] # true
+
+# Given this data structure write some code to return an array which contains
+# only the hashes where all the integers are even.
+
+arr = [{a: [1, 2, 3]}, {b: [2, 4, 6], c: [3, 6], d: [4]}, {e: [8], f: [6, 10]}]
+
+new_arr = arr.select { |hsh| hsh.all? { |(k, v)| v.all? { |num| num.even? } } }
+
+new_arr == [{e: [8], f: [6, 10]}] # true
+
+
+# 32 random hex characters
+# pattern 8-4-4-4-12
+
+def get_uuid
+  uuid = ""
+  (1..36).each do |index|
+    if [9, 14, 19, 24].include?(index)
+      uuid << '-'
+    else
+      uuid << %w(0 1 2 3 4 5 6 7 8 9 a b c d e f).sample
+    end
+  end
+  uuid
+end
+
+get_uuid
