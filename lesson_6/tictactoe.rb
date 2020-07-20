@@ -1,4 +1,5 @@
 require 'pry'
+require 'pry-byebug'
 
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
@@ -9,6 +10,7 @@ def prompt(msg)
 end
 
 def display_board(brd)
+  system 'clear'
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -45,8 +47,24 @@ def player_chooses!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def computer_chooses!(brd)
+  brd[empty_squares(brd).sample] = COMPUTER_MARKER
+end
+
+def board_full?(brd)
+  empty_squares(brd).empty?
+end
+
+def winner?(brd)
+  false
+end
+
 board = initialize_board
 display_board(board)
-player_chooses!(board)
-puts board.inspect
-display_board(board)
+
+loop do
+  player_chooses!(board)
+  computer_chooses!(board)
+  display_board(board)
+  break if winner?(board) || board_full?(board)
+end
