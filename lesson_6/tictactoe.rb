@@ -86,24 +86,52 @@ def joinor(arr, delimiter = ', ', last_delimiter = 'or')
   end
 end
 
+def display_score(hsh)
+  prompt "Current score is Player: #{hsh['Player']}" +
+         ", Computer: #{hsh['Computer']}"
+  prompt "Press enter to continue..."
+  gets.chomp
+end
+
+def champ(hsh)
+  if hsh['Player'] == 5
+    return 'Player'
+  elsif hsh['Computer'] == 5
+    return 'Computer'
+  end
+  nil
+end
+
 loop do
-  board = initialize_board
-
+  scores = {
+    'Player' => 0,
+    'Computer' => 0
+  }
   loop do
+    board = initialize_board
+
+    loop do
+      display_board(board)
+      player_chooses!(board)
+      break if winner?(board) || board_full?(board)
+      computer_chooses!(board)
+      break if winner?(board) || board_full?(board)
+    end
+
     display_board(board)
-    player_chooses!(board)
-    break if winner?(board) || board_full?(board)
-    computer_chooses!(board)
-    break if winner?(board) || board_full?(board)
+
+    if winner?(board)
+      winner = detect_winner(board)
+      prompt "#{winner} won!"
+      scores[winner] += 1
+    else
+      prompt "It's a tie!"
+    end
+    display_score(scores)
+    break if !!champ(scores)
   end
 
-  display_board(board)
-
-  if winner?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
-  end
+  prompt "#{champ(scores)} wins the match!"
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break if %(n).include?(answer.downcase[0])
