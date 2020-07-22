@@ -52,8 +52,23 @@ def player_chooses!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_best_square(brd, marker)
+  choice = nil
+  WINNING_LINES.each do |line|
+    if brd.values_at(*line).count(marker) == 2 &&
+       brd.values_at(*line).count(INITIAL_MARKER) == 1
+      choice = brd.select { |k, _| line.include?(k) }.key(INITIAL_MARKER)
+      break
+    end
+  end
+  choice
+end
+
 def computer_chooses!(brd)
-  brd[empty_squares(brd).sample] = COMPUTER_MARKER
+  choice = find_best_square(brd, COMPUTER_MARKER)
+  choice = find_best_square(brd, PLAYER_MARKER) unless !!choice
+  choice = empty_squares(brd).sample unless !!choice
+  brd[choice] = COMPUTER_MARKER
 end
 
 def board_full?(brd)
@@ -87,7 +102,7 @@ def joinor(arr, delimiter = ', ', last_delimiter = 'or')
 end
 
 def display_score(hsh)
-  prompt "Current score is Player: #{hsh['Player']}" +
+  prompt "Current score is Player: #{hsh['Player']}" \
          ", Computer: #{hsh['Computer']}"
   prompt "Press enter to continue..."
   gets.chomp
