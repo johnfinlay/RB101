@@ -67,6 +67,7 @@ end
 def computer_chooses!(brd)
   choice = find_best_square(brd, COMPUTER_MARKER)
   choice = find_best_square(brd, PLAYER_MARKER) unless !!choice
+  choice = 5 unless !!choice || brd[5] != ' '
   choice = empty_squares(brd).sample unless !!choice
   brd[choice] = COMPUTER_MARKER
 end
@@ -117,19 +118,39 @@ def champ(hsh)
   nil
 end
 
+def who_goes_first
+  prompt "Who should go first? (player, computer, random)"
+  answer = ''
+  loop do
+    answer = gets.chomp
+    break if %w(player computer random).include?(answer.downcase)
+    prompt "Please enter a valid choice: player, computer, random"
+  end
+  answer = %w(player computer).sample if answer == 'random'
+  return answer
+end
+
 loop do
   scores = {
     'Player' => 0,
     'Computer' => 0
   }
   loop do
+    first_move = who_goes_first
     board = initialize_board
 
     loop do
-      display_board(board)
-      player_chooses!(board)
-      break if winner?(board) || board_full?(board)
-      computer_chooses!(board)
+      if first_move == 'player'
+        display_board(board)
+        player_chooses!(board)
+        break if winner?(board) || board_full?(board)
+        computer_chooses!(board)
+      else
+        computer_chooses!(board)
+        break if winner?(board) || board_full?(board)
+        display_board(board)
+        player_chooses!(board)
+      end
       break if winner?(board) || board_full?(board)
     end
 
