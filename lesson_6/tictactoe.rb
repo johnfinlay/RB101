@@ -130,27 +130,27 @@ def who_goes_first
   return answer
 end
 
+def place_piece!(brd, who)
+  who == 'player' ? player_chooses!(brd) : computer_chooses!(brd)
+end
+
+def alternate_player(who)
+  who == 'player' ? 'computer' : 'player'
+end
+
 loop do
   scores = {
     'Player' => 0,
     'Computer' => 0
   }
   loop do
-    first_move = who_goes_first
+    current_player = who_goes_first
     board = initialize_board
 
     loop do
-      if first_move == 'player'
-        display_board(board)
-        player_chooses!(board)
-        break if winner?(board) || board_full?(board)
-        computer_chooses!(board)
-      else
-        computer_chooses!(board)
-        break if winner?(board) || board_full?(board)
-        display_board(board)
-        player_chooses!(board)
-      end
+      display_board(board)
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
       break if winner?(board) || board_full?(board)
     end
 
