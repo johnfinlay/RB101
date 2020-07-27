@@ -53,57 +53,37 @@ def player_chooses!(brd)
 end
 
 def find_best_square(brd, marker)
-  # best_value = -1000
-  # best_move = -1
   squares = {}
   empty_squares(brd).each do |square|
     brd[square] = marker
-    squares[square] = minimax(brd)
+    squares[square] = minimax(brd, 0, false, alternate_marker(marker))
     brd[square] = INITIAL_MARKER
-    # binding.pry
-    #if move_value > best_value
-    #  best_move = square
-    #  best_value = move_value
-    #end
   end
-  binding.pry
-  return squares.find { |k, v| v == squares.values.max }.first
-  # return best_move
-
+  # binding.pry
+  squares.find { |_, v| v == squares.values.max }.first
 end
 
 def computer_chooses!(brd)
   brd[find_best_square(brd, COMPUTER_MARKER)] = COMPUTER_MARKER
 end
 
-def minimax(brd, depth = 0, is_max = false)
+def minimax(brd, depth, is_max, marker)
   if winner?(brd)
     detect_winner(brd) == 'Player' ? (return -10 + depth) : (return 10 - depth)
   elsif board_full?(brd)
     return 0
   end
 
-  if is_max
-    best_score = -1000
-    empty_squares(brd).each do |square|
-      brd[square] = COMPUTER_MARKER
-      # new_score = minimax(brd, depth + 1, false)
-      # binding.pry
-      best_score = [best_score, minimax(brd, depth + 1, false)].max # new_score if new_score > best_score
-      brd[square] = INITIAL_MARKER
-    end
-  else
-    best_score = 1000
-    empty_squares(brd).each do |square|
-      brd[square] = PLAYER_MARKER
-      # new_score = minimax(brd, depth + 1, true)
-      # binding.pry
-      best_score = [best_score, minimax(brd, depth + 1, true)].min # new_score if new_score < best_score
-      brd[square] = INITIAL_MARKER
-    end
+  scores = is_max ? [-1000, -1000] : [1000, 1000]
+  empty_squares(brd).each do |square|
+    brd[square] = marker
+    marker = alternate_marker(marker)
+    scores[1] = minimax(brd, depth + 1, !is_max, marker)
+    # binding.pry
+    scores[0] = is_max ? scores.max : scores.min
+    brd[square] = INITIAL_MARKER
   end
-  # binding.pry
-  return best_score
+  scores[0]
 end
 
 def board_full?(brd)
@@ -161,11 +141,15 @@ def who_goes_first
     prompt "Please enter a valid choice: player, computer, random"
   end
   answer = %w(player computer).sample if answer == 'random'
-  return answer
+  answer
 end
 
 def place_piece!(brd, who)
   who == 'player' ? player_chooses!(brd) : computer_chooses!(brd)
+end
+
+def alternate_marker(marker)
+  marker == 'X' ? 'O' : 'X'
 end
 
 def alternate_player(who)
