@@ -53,23 +53,53 @@ def player_chooses!(brd)
 end
 
 def find_best_square(brd, marker)
-  choice = nil
-  WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(marker) == 2 &&
-       brd.values_at(*line).count(INITIAL_MARKER) == 1
-      choice = brd.select { |k, _| line.include?(k) }.key(INITIAL_MARKER)
-      break
+  best_value = -1000
+  best_move = -1
+  empty_squares(brd).each do |square|
+    brd[square] = marker
+    move_value = minimax(brd)
+    brd[square] = INITIAL_MARKER
+    # binding.pry
+    if move_value > best_value
+      best_move = square
+      best_value = move_value
     end
   end
-  choice
+  return best_move
 end
 
 def computer_chooses!(brd)
-  choice = find_best_square(brd, COMPUTER_MARKER)
-  choice = find_best_square(brd, PLAYER_MARKER) unless !!choice
-  choice = 5 unless !!choice || brd[5] != ' '
-  choice = empty_squares(brd).sample unless !!choice
-  brd[choice] = COMPUTER_MARKER
+  brd[find_best_square(brd, COMPUTER_MARKER)] = COMPUTER_MARKER
+end
+
+def minimax(brd, depth = 0, is_max = false)
+  if board_full?(brd)
+    return 0
+  elsif winner?(brd)
+    # binding.pry
+    detect_winner(brd) == 'Player' ? (return -10 + depth) : (return 10 - depth)
+  end
+
+  if is_max
+    best_score = -1000
+    empty_squares(brd).each do |square|
+      brd[square] = COMPUTER_MARKER
+      # new_score = minimax(brd, depth + 1, false)
+      best_score = [best_score, minimax(brd, depth + 1, false)].max # new_score if new_score > best_score
+      brd[square] = INITIAL_MARKER
+    end
+    return best_score
+  else
+    best_score = 1000
+    empty_squares(brd).each do |square|
+      brd[square] = PLAYER_MARKER
+      # new_score = minimax(brd, depth + 1, true)
+      # binding.pry
+      best_score = [best_score, minimax(brd, depth + 1, true)].min # new_score if new_score < best_score
+      brd[square] = INITIAL_MARKER
+    end
+    return best_score
+  end
 end
 
 def board_full?(brd)
