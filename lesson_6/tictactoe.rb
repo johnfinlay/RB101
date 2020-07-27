@@ -59,7 +59,6 @@ def find_best_square(brd, marker)
     squares[square] = minimax(brd, 0, false, alternate_marker(marker))
     brd[square] = INITIAL_MARKER
   end
-  # binding.pry
   squares.find { |_, v| v == squares.values.max }.first
 end
 
@@ -74,12 +73,11 @@ def minimax(brd, depth, is_max, marker)
     return 0
   end
 
-  scores = is_max ? [-1000, -1000] : [1000, 1000]
+  scores = is_max ? [-1000, 0] : [1000, 0]
   empty_squares(brd).each do |square|
     brd[square] = marker
     marker = alternate_marker(marker)
     scores[1] = minimax(brd, depth + 1, !is_max, marker)
-    # binding.pry
     scores[0] = is_max ? scores.max : scores.min
     brd[square] = INITIAL_MARKER
   end
