@@ -89,14 +89,18 @@ def busted?(score)
   score > 21
 end
 
-def get_winner(dealer_score, player_score)
+def get_winner(dealer_score, player_score, games_won)
   if player_score > 21
+    games_won[:dealer] += 1
     :player_busted
   elsif dealer_score > 21
+    games_won[:player] += 1
     :dealer_busted
   elsif player_score < dealer_score
+    games_won[:dealer] += 1
     :dealer
   elsif dealer_score < player_score
+    games_won[:player] += 1
     :player
   else
     :tie
@@ -129,28 +133,55 @@ def play_again?
   answer.downcase.start_with?('y')
 end
 
+def display_match_score(games_won)
+  prompt "\n\n=> Dealer has won #{games_won[:dealer]} games."
+  prompt "You have won #{games_won[:player]} games.\n\n"
+end
+
+def display_match_results(games_won)
+  if games_won[:dealer] == 5
+    prompt "Dealer won the match!"
+  else
+    prompt "You won the match!"
+  end
+end
+
+def match_winner?(games_won)
+  games_won[:dealer] == 5 || games_won[:player] == 5
+end
+
 prompt "Welcome to Twenty-One!"
 loop do
-  hands = {
-    dealer: [],
-    player: []
+  games_won = {
+    player: 0,
+    dealer: 0
   }
-  deck = new_deck
+  loop do
+    hands = {
+      dealer: [],
+      player: []
+    }
+    deck = new_deck
 
-  2.times do
-    deal_card!(hands[:dealer], deck)
-    deal_card!(hands[:player], deck)
+    2.times do
+      deal_card!(hands[:dealer], deck)
+      deal_card!(hands[:player], deck)
+    end
+
+    player_score = total(hands[:player])
+    dealer_score = total(hands[:dealer])
+
+    player_score = player_turn(hands, deck, player_score)
+    dealer_score = dealer_turn(hands[:dealer], deck, dealer_score) unless busted?(player_score)
+    display_hands(hands, false)
+    display_score(dealer_score, player_score)
+    display_results(get_winner(dealer_score, player_score, games_won))
+    display_match_score(games_won)
+    prompt "Press enter to continue."
+    gets.chomp
+    break if match_winner?(games_won)
   end
-
-  player_score = total(hands[:player])
-  dealer_score = total(hands[:dealer])
-
-  player_score = player_turn(hands, deck, player_score)
-  dealer_score = dealer_turn(hands[:dealer], deck, dealer_score) unless busted?(player_score)
-  display_hands(hands, false)
-  display_score(dealer_score, player_score)
-  display_results(get_winner(dealer_score, player_score))
-
+  display_match_results(games_won)
   break unless play_again?
 end
 
