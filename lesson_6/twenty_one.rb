@@ -38,7 +38,7 @@ def display_hands(hands, hide_one = true)
   prompt format_cards(hands[:player])
 end
 
-def player_turn(hands, deck)
+def player_turn(hands, deck, player_score)
   loop do
     display_hands(hands)
     prompt "Your turn, hit or stay(h/s)?"
@@ -49,8 +49,10 @@ def player_turn(hands, deck)
       prompt "Invalid choice, try again"
     end
     deal_card!(hands[:player], deck) if choice == 'h'
-    break if choice == 's' || busted?(hands[:player])
+    player_score = total(hands[:player])
+    break if choice == 's' || busted?(player_score)
   end
+  player_score
 end
 
 def total(cards)
@@ -74,21 +76,20 @@ def total(cards)
   sum
 end
 
-def dealer_turn(cards, deck)
+def dealer_turn(cards, deck, dealer_score)
   loop do
-    break if total(cards) >= 17 || busted?(cards)
+    break if dealer_score >= 17 || busted?(dealer_score)
     deal_card!(cards, deck)
+    dealer_score = total(cards)
   end
+  dealer_score
 end
 
-def busted?(cards)
-  total(cards) > 21
+def busted?(score)
+  score > 21
 end
 
-def get_winner(hands)
-  dealer_score = total(hands[:dealer])
-  player_score = total(hands[:player])
-
+def get_winner(dealer_score, player_score)
   if player_score > 21
     :player_busted
   elsif dealer_score > 21
@@ -117,9 +118,9 @@ def display_results(winner)
   end
 end
 
-def display_score(hands)
-  prompt "The score is Dealer: #{total(hands[:dealer])}"\
-         " Player: #{total(hands[:player])}"
+def display_score(dealer_score, player_score)
+  prompt "The score is Dealer: #{dealer_score}"\
+         " Player: #{player_score}"
 end
 
 def play_again?
@@ -134,7 +135,6 @@ loop do
     dealer: [],
     player: []
   }
-
   deck = new_deck
 
   2.times do
@@ -142,11 +142,14 @@ loop do
     deal_card!(hands[:player], deck)
   end
 
-  player_turn(hands, deck)
-  dealer_turn(hands[:dealer], deck) unless busted?(hands[:player])
+  player_score = total(hands[:player])
+  dealer_score = total(hands[:dealer])
+
+  player_score = player_turn(hands, deck, player_score)
+  dealer_score = dealer_turn(hands[:dealer], deck, dealer_score) unless busted?(player_score)
   display_hands(hands, false)
-  display_score(hands)
-  display_results(get_winner(hands))
+  display_score(dealer_score, player_score)
+  display_results(get_winner(dealer_score, player_score))
 
   break unless play_again?
 end
