@@ -37,8 +37,19 @@ def display_hands(hands, hide_one = true)
   prompt format_cards(hands[:player])
 end
 
-def player_turn(hands)
-
+def player_turn(hands, deck)
+  loop do
+    display_hands(hands)
+    prompt "Your turn, hit or stay(h/s)?"
+    choice = ''
+    loop do
+      choice = gets.chomp[0].downcase
+      break if %w(h s).include?(choice)
+      prompt "Invalid choice, try again"
+    end
+    deal_card!(hands[:player], deck) if choice == 'h'
+    break if choice == 's' || busted?(hands[:player])
+  end
 end
 
 def total(cards)
@@ -62,20 +73,38 @@ def total(cards)
   sum
 end
 
-def dealer_turn(cards)
-
+def dealer_turn(cards, deck)
+  loop do
+    break if total(cards) >= 17 || busted?(cards)
+    deal_card!(cards, deck)
+  end
 end
 
 def busted?(cards)
-
+  total(cards) > 21
 end
 
 def get_winner(hands)
-
+  dealer_score = total(hands[:dealer])
+  player_score = total(hands[:player])
+  if player_score > 21 || player_score < dealer_score
+    return :dealer
+  elsif dealer_score > 21 || dealer_score < player_score
+    return :player
+  end
+  nil
 end
 
-def display_results(hands)
+def display_results(winner)
+  if !!winner
+    prompt "#{winner.capitalize} wins!"
+  else
+    prompt "It's a tie!"
+  end
+end
 
+def display_score(hands)
+  prompt "The score is Dealer: #{total(hands[:dealer])} Player: #{total(hands[:player])}"
 end
 
 hands = {
@@ -90,8 +119,7 @@ deck = new_deck
   deal_card!(hands[:player], deck)
 end
 
-
-
-display_hands(hands, false)
-prompt "Dealer Total: #{total(hands[:dealer])}"
-prompt "Player Total: #{total(hands[:player])}"
+player_turn(hands, deck)
+dealer_turn(hands[:dealer], deck) unless busted?(hands[:player])
+display_score(hands)
+display_results(get_winner(hands))
