@@ -4,36 +4,52 @@ require 'pry-byebug'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
-WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-                [[1, 5, 9], [3, 5, 7]]
+WINNING_LINES = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]] +
+                [[16, 17, 18, 19, 20], [21, 22, 23, 24, 25]] +
+                [[1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23]] +
+                [[4, 9, 14, 19, 24], [5, 10, 15, 20, 25]] +
+                [[1, 7, 13, 19, 25], [5, 9, 13, 17, 21]]
 def prompt(msg)
   puts "=> #{msg}"
 end
 
 # rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/MethodLength
+
 def display_board(brd)
   system 'clear'
   puts "You're a #{PLAYER_MARKER}, Computer is a #{COMPUTER_MARKER}"
   puts ""
-  puts "     |     |"
-  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
-  puts "     |     |"
-  puts "-----+-----+-----"
-  puts "     |     |"
-  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
-  puts "     |     |"
-  puts "-----+-----+-----"
-  puts "     |     |"
-  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
-  puts "     |     |"
+  puts "     |     |     |     |"
+  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}  |  #{brd[4]}  |  #{brd[5]}"
+  puts "     |     |     |     |"
+  puts "-----+-----+-----+-----+-----"
+  puts "     |     |     |     |"
+  puts "  #{brd[6]}  |  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}  |  #{brd[10]}"
+  puts "     |     |     |     |"
+  puts "-----+-----+-----+-----+-----"
+  puts "     |     |     |     |"
+  puts "  #{brd[11]}  |  #{brd[12]}  |  #{brd[13]}"\
+       "  |  #{brd[14]}  |  #{brd[15]}"
+  puts "     |     |     |     |"
+  puts "-----+-----+-----+-----+-----"
+  puts "     |     |     |     |"
+  puts "  #{brd[16]}  |  #{brd[17]}  |  #{brd[18]}"\
+       "  |  #{brd[19]}  |  #{brd[20]}"
+  puts "     |     |     |     |"
+  puts "-----+-----+-----+-----+-----"
+  puts "     |     |     |     |"
+  puts "  #{brd[21]}  |  #{brd[22]}  |  #{brd[23]}"\
+       "  |  #{brd[24]}  |  #{brd[25]}"
+  puts "     |     |     |     |"
   puts ""
 end
 # rubocop:enable Metrics/AbcSize
+# rubocop:enable Metrics/MethodLength
 
 def initialize_board
   new_board = {}
-  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
+  (1..25).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
@@ -58,6 +74,7 @@ def find_best_square(brd, marker)
     brd[square] = marker
     squares[square] = minimax(brd, 0, false, alternate_marker(marker))
     brd[square] = INITIAL_MARKER
+    # binding.pry
   end
   squares.find { |_, v| v == squares.values.max }.first
 end
@@ -66,20 +83,23 @@ def computer_chooses!(brd)
   brd[find_best_square(brd, COMPUTER_MARKER)] = COMPUTER_MARKER
 end
 
-def minimax(brd, depth, is_max, marker)
+def minimax(brd, depth, is_max, marker, alpha = -1000, beta = 1000)
   if winner?(brd)
     detect_winner(brd) == 'Player' ? (return -10 + depth) : (return 10 - depth)
   elsif board_full?(brd)
     return 0
   end
-
+  max_depth = 6
   scores = is_max ? [-1000, 0] : [1000, 0]
   empty_squares(brd).each do |square|
+    break if depth == max_depth
     brd[square] = marker
     marker = alternate_marker(marker)
-    scores[1] = minimax(brd, depth + 1, !is_max, marker)
+    scores[1] = minimax(brd, depth + 1, !is_max, marker, alpha, beta)
+    is_max ? (alpha = [alpha, scores[0]].max) : (beta = [beta, scores[0]].min)
     scores[0] = is_max ? scores.max : scores.min
     brd[square] = INITIAL_MARKER
+    break if beta <= alpha
   end
   scores[0]
 end
@@ -94,9 +114,9 @@ end
 
 def detect_winner(brd)
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 3
+    if brd.values_at(*line).count(PLAYER_MARKER) == 5
       return 'Player'
-    elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
+    elsif brd.values_at(*line).count(COMPUTER_MARKER) == 5
       return 'Computer'
     end
   end
