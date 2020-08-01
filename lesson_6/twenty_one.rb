@@ -122,20 +122,33 @@ def display_score(hands)
          " Player: #{total(hands[:player])}"
 end
 
-hands = {
-  dealer: [],
-  player: []
-}
-
-deck = new_deck
-
-2.times do
-  deal_card!(hands[:dealer], deck)
-  deal_card!(hands[:player], deck)
+def play_again?
+  prompt "Do you want to play again? (y or n)"
+  answer = gets.chomp
+  answer.downcase.start_with?('y')
 end
 
-player_turn(hands, deck)
-dealer_turn(hands[:dealer], deck) unless busted?(hands[:player])
-display_hands(hands, false)
-display_score(hands)
-display_results(get_winner(hands))
+prompt "Welcome to Twenty-One!"
+loop do
+  hands = {
+    dealer: [],
+    player: []
+  }
+
+  deck = new_deck
+
+  2.times do
+    deal_card!(hands[:dealer], deck)
+    deal_card!(hands[:player], deck)
+  end
+
+  player_turn(hands, deck)
+  dealer_turn(hands[:dealer], deck) unless busted?(hands[:player])
+  display_hands(hands, false)
+  display_score(hands)
+  display_results(get_winner(hands))
+
+  break unless play_again?
+end
+
+prompt "Thanks for playing! Bye!"
