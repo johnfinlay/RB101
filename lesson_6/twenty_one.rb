@@ -91,5 +91,7 @@ deck = new_deck
 end
 
 
-display_hands(hands, true)
+
 display_hands(hands, false)
+prompt "Dealer Total: #{total(hands[:dealer])}"
+prompt "Player Total: #{total(hands[:player])}"
