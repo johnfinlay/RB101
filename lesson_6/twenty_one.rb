@@ -88,18 +88,31 @@ end
 def get_winner(hands)
   dealer_score = total(hands[:dealer])
   player_score = total(hands[:player])
-  if player_score > 21 || player_score < dealer_score
-    return :dealer unless dealer_score > 21
-  elsif dealer_score > 21 || dealer_score < player_score
-    return :player
+
+  if player_score > 21
+    :player_busted
+  elsif dealer_score > 21
+    :dealer_busted
+  elsif player_score < dealer_score
+    :dealer
+  elsif dealer_score < player_score
+    :player
+  else
+    :tie
   end
-  nil
 end
 
 def display_results(winner)
-  if !!winner
-    prompt "#{winner.capitalize} wins!"
-  else
+  case winner
+  when :player_busted
+    prompt "You busted! Dealer wins!"
+  when :dealer_busted
+    prompt "Dealer busted! You win!"
+  when :player
+    prompt "You win!"
+  when :dealer
+    prompt "Dealer wins!"
+  when :tie
     prompt "It's a tie!"
   end
 end
