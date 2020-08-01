@@ -28,6 +28,7 @@ def format_cards(cards)
 end
 
 def display_hands(hands, hide_one = true)
+  system 'clear'
   dealer_cards = hands[:dealer].map.with_index do |card, index|
     index == 0 && hide_one ? ['?', '?'] : card
   end
@@ -57,13 +58,13 @@ def total(cards)
 
   sum = 0
   values.each do |value|
-    if value == 'A'
-      sum += 11
-    elsif value.to_i == 0
-      sum += 10
-    else
-      sum += value.to_i
-    end
+    sum += if value == 'A'
+             11
+           elsif value.to_i == 0
+             10
+           else
+             value.to_i
+           end
   end
 
   values.select { |value| value == 'A' }.count.times do
@@ -88,7 +89,7 @@ def get_winner(hands)
   dealer_score = total(hands[:dealer])
   player_score = total(hands[:player])
   if player_score > 21 || player_score < dealer_score
-    return :dealer
+    return :dealer unless dealer_score > 21
   elsif dealer_score > 21 || dealer_score < player_score
     return :player
   end
@@ -104,7 +105,8 @@ def display_results(winner)
 end
 
 def display_score(hands)
-  prompt "The score is Dealer: #{total(hands[:dealer])} Player: #{total(hands[:player])}"
+  prompt "The score is Dealer: #{total(hands[:dealer])}"\
+         " Player: #{total(hands[:player])}"
 end
 
 hands = {
@@ -121,5 +123,6 @@ end
 
 player_turn(hands, deck)
 dealer_turn(hands[:dealer], deck) unless busted?(hands[:player])
+display_hands(hands, false)
 display_score(hands)
 display_results(get_winner(hands))
